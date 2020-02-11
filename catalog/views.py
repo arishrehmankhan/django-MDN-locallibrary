@@ -48,3 +48,23 @@ def AuthorDetailView(request, pk):
         'books_of_author': books_of_author,
     }
     return render(request, 'catalog/author_detail.html', context=context)
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class LoanedBooksByUserListViews(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+    
+from django.contrib.auth.mixins import PermissionRequiredMixin
+class BorrowedBooksListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    permission_required = 'catalog.can_mark_returned'
+    model = BookInstance
+    template_name = 'catalog/borrowed_books.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status='o').order_by('due_back')
