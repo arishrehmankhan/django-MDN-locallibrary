@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Book, Author, BookInstance, Genre
+from django.views import generic
 
 # Create your views here.
 def index(request):
@@ -23,3 +24,23 @@ def index(request):
     }
 
     return render(request, 'index.html', context=context)
+
+class BookListView(generic.ListView):
+    model = Book
+    paginate_by = 2
+
+class BookDetailView(generic.DetailView):
+    model = Book
+
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 2
+
+def AuthorDetailView(request, pk):
+    author = Author.objects.get(pk=pk)
+    books_of_author = Book.objects.filter(author=author)
+    context = {
+        'author': author,
+        'books_of_author': books_of_author,
+    }
+    return render(request, 'catalog/author_detail.html', context=context)
