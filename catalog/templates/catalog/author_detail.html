@@ -11,4 +11,5 @@
     <p>{{ book.summary }}</p>
     {% endfor %}
 </div>
-{% endblock %}
+{% if perms.catalog.can_mark_returned %}
+<a href="{% url 'author_delete' author.id %}">Delete author</a> {% endif %} {% endblock %}
